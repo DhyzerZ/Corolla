@@ -32,4 +32,13 @@ urlpatterns = [
     path('newton/', applicationViews.newton),
     path('spline/', applicationViews.spline),
     path('vandermonde/', applicationViews.vandermonde),
+    path('incremental-search/',applicationViews.incremental_search),
+    path('gaussian-elimination/',applicationViews.gaussian_elimination),
+    path('gaussian-elimination-with-pivoting/',applicationViews.gaussian_elimination_with_pivoting),
+    path('gaussian-elimination-with-total-pivoting/',applicationViews.gaussian_elimination_with_total_pivoting),
+    path('lu-factorization/',applicationViews.lu_factorization),
+    path('crout-factorization/',applicationViews.crout_factorization),
+    path('cholesky-factorization/',applicationViews.cholesky_factorization),
+    path('doolittle-factorization/',applicationViews.doolittle_factorization),
+
 ]
