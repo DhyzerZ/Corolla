@@ -29,8 +29,6 @@ urlpatterns = [
     path('newton-raphson/', applicationViews.newton_raphson),
     path('secant/', applicationViews.secant),
     path('sor/', applicationViews.sor),
-    path('newton/', applicationViews.newton),
-    path('spline/', applicationViews.spline),
     path('vandermonde/', applicationViews.vandermonde),
     path('incremental-search/',applicationViews.incremental_search),
     path('gaussian-elimination/',applicationViews.gaussian_elimination),
