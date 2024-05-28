@@ -12,7 +12,16 @@ from application.Secante import Secante
 from application.Newton import Newton
 from application.Spline import Spline
 from application.Graficar import Graficas
+from application.IncrementalSearch import IncrementalSearch
+from application.Gaussian_elimination import GaussianElimination
+from application.Gaussian_elimination_with_pivoting import GaussianEliminationPP
+from application.Gaussian_elimination_with_total_pivoting import GaussianEliminationTP
+from application.Lu_decomposition import LUDecomposition
+from application.crout_decomposition import CroutDecomposition
+from application.cholesky_decomposition import CholeskyDecomposition
+from application.doolittle_decomposition import DoolittleDecomposition 
 
+import math
 # Create your views here.
 
 def home(request):
@@ -38,6 +47,158 @@ def home(request):
 
     return render(request, 'index.html', {'graph' : grafica, 'default': default, 'datos': datos})
 
+def crout_factorization(request):
+    resultado = mensaje = L = U = None
+
+    if request.method == 'POST':
+        try:
+            A = request.POST.get('A')
+
+            # Convierte la cadena de texto en una lista de listas
+            A = eval(A)
+
+            L, U = CroutDecomposition.crout_factorization(A)
+            resultado = True
+            mensaje = "Factorización Crout realizada con éxito"
+        except Exception as e:
+            mensaje = f"Error: {str(e)}"
+
+    return render(request, 'crout_factorization.html', {'resultado': resultado, 'mensaje': mensaje, 'L': L, 'U': U})
+
+def cholesky_factorization(request):
+    resultado = mensaje = L = LT = None
+
+    if request.method == 'POST':
+        try:
+            A = request.POST.get('A')
+
+            # Convierte la cadena de texto en una lista de listas
+            A = eval(A)
+
+            L = CholeskyDecomposition.cholesky_factorization(A)
+            LT = [[L[j][i] for j in range(len(L))] for i in range(len(L))]
+            resultado = True
+            mensaje = "Factorización Cholesky realizada con éxito"
+        except Exception as e:
+            mensaje = f"Error: {str(e)}"
+
+    return render(request, 'cholesky_factorization.html', {'resultado': resultado, 'mensaje': mensaje, 'L': L, 'LT': LT})
+
+def doolittle_factorization(request):
+    resultado = mensaje = L = U = None
+
+    if request.method == 'POST':
+        try:
+            A = request.POST.get('A')
+
+            # Convierte la cadena de texto en una lista de listas
+            A = eval(A)
+
+            L, U = DoolittleDecomposition.doolittle_factorization(A)
+            resultado = True
+            mensaje = "Factorización Doolittle realizada con éxito"
+        except Exception as e:
+            mensaje = f"Error: {str(e)}"
+
+    return render(request, 'doolittle_factorization.html', {'resultado': resultado, 'mensaje': mensaje, 'L': L, 'U': U})
+
+def incremental_search(request):
+    resultado = mensaje = datos = None
+
+    if request.method == 'POST':
+        funcion = request.POST.get('funcion')
+        xinit = request.POST.get('xinit')
+        dx = request.POST.get('dx')
+        iteraciones = request.POST.get('iteraciones')
+
+        try:
+            xinit = float(xinit)
+            dx = float(dx.replace(',', '.'))  
+            iteraciones = int(iteraciones)
+
+            datos = {
+                'fun': funcion,
+                'xinit': '{:.10f}'.format(xinit),
+                'dx': '{:.10f}'.format(dx),
+                'iter': iteraciones
+            }
+
+            funcion = funcion.replace('^', '**')  
+            safe_dict = {k: v for k, v in math.__dict__.items() if not k.startswith("__")}
+            safe_dict['x'] = xinit
+
+            eval(funcion, {"__builtins__": None}, safe_dict)
+
+            resultado, mensaje = IncrementalSearch.incremental_search(funcion, xinit, dx, iteraciones)
+        except (ValueError, TypeError) as e:
+            mensaje = f"Error in input values: {str(e)}"
+        except Exception as e:
+            mensaje = f"Error evaluating function: {str(e)}"
+
+    return render(request, 'incremental_search.html', {'resultado': resultado, 'mensaje': mensaje, 'datos': datos})
+
+def gaussian_elimination_with_total_pivoting(request):
+    resultado = mensaje = None
+
+    if request.method == 'POST':
+        try:
+            A = request.POST.get('A')
+            b = request.POST.get('b')
+
+            # Convierte las cadenas de texto en listas de listas y listas
+            A = eval(A)
+            b = eval(b)
+
+            resultado = GaussianEliminationTP.elimination_with_total_pivoting(A, b)
+            mensaje = "Sistema resuelto con éxito"
+        except Exception as e:
+            mensaje = f"Error: {str(e)}"
+
+    resultados_con_indices = list(enumerate(resultado)) if resultado else []
+
+    return render(request, 'gaussian_elimination_with_total_pivoting.html', {'resultados_con_indices': resultados_con_indices, 'mensaje': mensaje})
+
+def gaussian_elimination(request):
+    resultado = mensaje = None
+
+    if request.method == 'POST':
+        try:
+            A = request.POST.get('A')
+            b = request.POST.get('b')
+
+            # Convierte las cadenas de texto en listas de listas y listas
+            A = eval(A)
+            b = eval(b)
+
+            resultado = GaussianElimination.simple_elimination(A, b)
+            mensaje = "Sistema resuelto con éxito"
+        except Exception as e:
+            mensaje = f"Error: {str(e)}"
+
+    resultados_con_indices = list(enumerate(resultado)) if resultado else []
+
+    return render(request, 'gaussian_elimination.html', {'resultados_con_indices': resultados_con_indices, 'mensaje': mensaje})
+
+def gaussian_elimination_with_pivoting(request):
+    resultado = mensaje = None
+
+    if request.method == 'POST':
+        try:
+            A = request.POST.get('A')
+            b = request.POST.get('b')
+
+            # Convierte las cadenas de texto en listas de listas y listas
+            A = eval(A)
+            b = eval(b)
+
+            resultado = GaussianEliminationPP.elimination_with_pivoting(A, b)
+            mensaje = "Sistema resuelto con éxito"
+        except Exception as e:
+            mensaje = f"Error: {str(e)}"
+
+    resultados_con_indices = list(enumerate(resultado)) if resultado else []
+
+    return render(request, 'gaussian_elimination_with_pivoting.html', {'resultados_con_indices': resultados_con_indices, 'mensaje': mensaje})
 
 def bisection(request):
 
@@ -112,6 +273,24 @@ def false_position(request):
             mensaje = f'Error: \'a\' has to be less than \'b\': a = {intervaloA} and b = {intervaloB}'
 
     return render(request, 'false-position.html', {'resultado': resultado, 'mensaje': mensaje, 'datos': datos})
+
+def lu_factorization(request):
+    resultado = mensaje = L = U = None
+
+    if request.method == 'POST':
+        try:
+            A = request.POST.get('A')
+
+            # Convierte la cadena de texto en una lista de listas
+            A = eval(A)
+
+            L, U = LUDecomposition.lu_factorization(A)
+            resultado = True
+            mensaje = "Factorización LU realizada con éxito"
+        except Exception as e:
+            mensaje = f"Error: {str(e)}"
+
+    return render(request, 'lu_factorization.html', {'resultado': resultado, 'mensaje': mensaje, 'L': L, 'U': U})
 
 def fixed_point(request):
 
